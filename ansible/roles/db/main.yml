@@ -1,0 +1,47 @@
+---
+- name: Install MySQL Server
+  apt:
+    name: mysql-server
+    state: present
+    update_cache: yes
+
+- name: Start and Enable MySQL
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Allow MySQL to listen on all interfaces
+  lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: 'bind-address = 0.0.0.0'
+
+- name: Restart MySQL
+  service:
+    name: mysql
+    state: restarted
+
+- name: Install MySQL Python library
+  apt:
+    name: python3-pymysql
+    state: present
+
+- name: Create database
+  mysql_db:
+    name: userdb
+    state: present
+
+- name: Create MySQL user
+  mysql_user:
+    name: appuser
+    password: admin
+    priv: 'userdb.*:ALL'
+    host: '%'
+    state: present
+
+- name: Allow MySQL port in firewall
+  ufw:
+    rule: allow
+    port: '3306'
+    proto: tcp

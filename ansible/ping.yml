@@ -1,0 +1,7 @@
+---
+- name: Test connectivity to all nodes
+  hosts: all
+  become: false
+
+  roles:
+    - ping_role

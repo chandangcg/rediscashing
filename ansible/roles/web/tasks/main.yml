@@ -1,0 +1,90 @@
+---
+# -----------------------------
+# Install dependencies
+# -----------------------------
+- name: Install required packages
+  apt:
+    name:
+      - curl
+      - ca-certificates
+      - gnupg
+    state: present
+    update_cache: yes
+
+# -----------------------------
+# Add NodeSource repo (idempotent)
+# -----------------------------
+- name: Add NodeSource GPG key
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+
+- name: Add NodeSource repo
+  apt_repository:
+    repo: "deb https://deb.nodesource.com/node_18.x {{ ansible_distribution_release }} main"
+    state: present
+
+# -----------------------------
+# Install Node.js (includes npm)
+# -----------------------------
+- name: Install Node.js
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
+# -----------------------------
+# Create app directory
+# -----------------------------
+- name: Create app directory
+  file:
+    path: /home/{{ ansible_user }}/app
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+# -----------------------------
+# Copy application files
+# -----------------------------
+- name: Copy app files
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ ansible_user }}/app/
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - app.js
+    - db.js
+    - package.json
+
+# -----------------------------
+# Install Node dependencies
+# -----------------------------
+- name: Install npm dependencies
+  npm:
+    path: /home/{{ ansible_user }}/app
+
+# -----------------------------
+# Ensure Redis package installed
+# -----------------------------
+- name: Install Redis npm package
+  npm:
+    name: redis
+    path: /home/{{ ansible_user }}/app
+
+# -----------------------------
+# Kill existing app (safe)
+# -----------------------------
+- name: Kill running Node app if exists
+  shell: pkill -f "node app.js"
+  ignore_errors: yes
+
+# -----------------------------
+# Start app (idempotent)
+# -----------------------------
+- name: Start Node app
+  shell: |
+    nohup node app.js > app.log 2>&1 &
+  args:
+    chdir: /home/{{ ansible_user }}/app

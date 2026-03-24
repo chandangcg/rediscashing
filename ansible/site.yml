@@ -1,0 +1,36 @@
+
+- name: Setup Database (on monitoring VM)
+  hosts: db
+  become: yes
+  roles:
+    - db
+
+- name: Setup Web Servers
+  hosts: web
+  become: yes
+  roles:
+    - web
+
+- name: Setup Load Balancer
+  hosts: lb
+  become: yes
+  roles:
+    - lb
+  
+- name: Setup Redis Cache Server
+  hosts: cache
+  become: yes
+  roles:
+    - redis
+
+- name: Configure Web Servers with Redis
+  hosts: web
+  become: yes
+  roles:
+    - web
+
+- name: Configure Load Balancer
+  hosts: lb
+  become: yes
+  roles:
+    - lb

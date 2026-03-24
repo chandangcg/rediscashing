@@ -1,0 +1,29 @@
+---
+- name: Install Redis
+  apt:
+    name: redis-server
+    state: present
+    update_cache: yes
+
+- name: Allow remote connections
+  lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^bind'
+    line: 'bind 0.0.0.0'
+
+- name: Disable protected mode
+  lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^protected-mode'
+    line: 'protected-mode no'
+
+- name: Restart Redis
+  service:
+    name: redis-server
+    state: restarted
+    enabled: yes
+
+- name: Open Redis port
+  ufw:
+    rule: allow
+    port: 6379

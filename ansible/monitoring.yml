@@ -1,0 +1,90 @@
+---
+- name: Install Prometheus and Grafana
+  hosts: grafana
+  become: yes
+
+  vars:
+    prometheus_version: "2.51.2"
+
+  tasks:
+
+  - name: Install required packages
+    apt:
+      name:
+        - wget
+        - apt-transport-https
+        - software-properties-common
+      state: present
+      update_cache: yes
+
+  - name: Download Prometheus
+    get_url:
+      url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+      dest: /tmp/prometheus.tar.gz
+
+  - name: Extract Prometheus
+    unarchive:
+      src: /tmp/prometheus.tar.gz
+      dest: /opt/
+      remote_src: yes
+
+  - name: Create Prometheus config
+    copy:
+      dest: /opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml
+      content: |
+        global:
+          scrape_interval: 15s
+
+        scrape_configs:
+          - job_name: "node_exporters"
+            static_configs:
+              - targets:
+                - "192.168.1.141:9100"
+                - "192.168.1.143:9100"
+                - "192.168.1.142:9100"
+
+  - name: Create Prometheus service
+    copy:
+      dest: /etc/systemd/system/prometheus.service
+      content: |
+        [Unit]
+        Description=Prometheus Monitoring
+        After=network.target
+
+        [Service]
+        ExecStart=/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus \
+        --config.file=/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: Reload systemd
+    command: systemctl daemon-reload
+
+  - name: Start Prometheus
+    systemd:
+      name: prometheus
+      state: started
+      enabled: yes
+
+  - name: Add Grafana repository key
+    apt_key:
+      url: https://packages.grafana.com/gpg.key
+      state: present
+
+  - name: Add Grafana repository
+    apt_repository:
+      repo: "deb https://packages.grafana.com/oss/deb stable main"
+      state: present
+
+  - name: Install Grafana
+    apt:
+      name: grafana
+      state: present
+      update_cache: yes
+
+  - name: Start Grafana service
+    systemd:
+      name: grafana-server
+      state: started
+      enabled: yes
