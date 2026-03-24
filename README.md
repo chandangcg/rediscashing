@@ -1,10 +1,10 @@
-# 🚀 3-Tier Project
+# 3-Tier Architecture Project
 
 **Terraform + Ansible + Nginx + Node.js + MySQL + Redis (VirtualBox Setup)**
 
 ---
 
-## 📌 Project Description
+## Project Description
 
 This project demonstrates a **complete end-to-end DevOps setup** of a **3-tier web application architecture** using:
 
