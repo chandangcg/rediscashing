@@ -1,4 +1,4 @@
-# 🚀 3-Tier DevOps Project
+# 🚀 3-Tier Project
 
 **Terraform + Ansible + Nginx + Node.js + MySQL + Redis (VirtualBox Setup)**
 
@@ -61,13 +61,13 @@ The application supports:
 
 ## 🖥️ VM Configuration
 
-| VM Name       | Role               | IP Address    |
-| ------------- | ------------------ | ------------- |
-| node1         | Application Server | 192.168.1.141 |
-| node2         | Application Server | 192.168.1.143 |
-| lb            | Load Balancer      | 192.168.1.142 |
-| grafana (mon) | MySQL Database     | 192.168.1.147 |
-| cache         | Redis Server       | 192.168.1.199 |
+| VM Name       | Role               
+| ------------- | ------------------ 
+| node1         | Application Server 
+| node2         | Application Server 
+| lb            | Load Balancer      
+| grafana (mon) | MySQL Database     
+| cache         | Redis Server       
 
 ---
 
@@ -81,43 +81,26 @@ The application supports:
 
 ---
 
-## 📂 Project Structure
-
-```id="arc2"
-ansible/
-├── inventory.ini
-├── site.yml
-├── roles/
-│   ├── web/
-│   │   └── tasks/main.yml
-│   ├── lb/
-│   │   └── tasks/main.yml
-│   └── redis/
-│       └── tasks/main.yml
-```
-
----
-
 ## 🧾 Inventory Configuration
 
 ```ini id="arc3"
 [web]
-node1 ansible_host=192.168.1.141 ansible_user=node1 ansible_password=admin
-node2 ansible_host=192.168.1.143 ansible_user=node2 ansible_password=admin
+node1 ansible_host=192.168.1.x ansible_user=node1 ansible_password=admin
+node2 ansible_host=192.168.1.x ansible_user=node2 ansible_password=admin
 
 [lb]
-loadbalancer ansible_host=192.168.1.142 ansible_user=lb ansible_password=admin
+loadbalancer ansible_host=192.168.1.x ansible_user=lb ansible_password=admin
 
 [db]
-grafana ansible_host=192.168.1.147 ansible_user=mon ansible_password=admin
+grafana ansible_host=192.168.1.x ansible_user=mon ansible_password=admin
 
 [cache]
-redis ansible_host=192.168.1.199 ansible_user=cache ansible_password=admin
+redis ansible_host=192.168.1.x ansible_user=cache ansible_password=admin
 ```
 
 ---
 
-## 🚀 Deployment Steps
+##  Steps
 
 ### 1️⃣ Verify connectivity
 
@@ -138,7 +121,7 @@ ansible-playbook -i inventory.ini site.yml -K
 ### 3️⃣ Access application
 
 ```bash id="arc6"
-http://192.168.1.142
+http://192.168.1.x
 ```
 
 ---
@@ -171,7 +154,7 @@ Login Request →
 
 ---
 
-## 🧪 Redis Manual Verification
+##  Redis Manual Verification
 
 ```bash id="arc8"
 redis-cli
@@ -187,7 +170,7 @@ ttl user:<username>
 
 ---
 
-### ❌ Network Issue (No route to host)
+###  Network Issue (No route to host)
 
 ```id="arc9"
 ssh: No route to host
@@ -206,7 +189,7 @@ ip a
 
 ---
 
-### ❌ Ansible SSH Failure
+###  Ansible SSH Failure
 
 ```id="arc11"
 UNREACHABLE!
@@ -220,7 +203,7 @@ sudo systemctl start ssh
 
 ---
 
-### ❌ Missing sudo password
+###  Missing sudo password
 
 ```id="arc13"
 Missing sudo password
@@ -234,7 +217,7 @@ ansible-playbook site.yml -K
 
 ---
 
-### ❌ Node.js not starting
+###  Node.js not starting
 
 ```id="arc15"
 Connection refused on port 3000
@@ -248,7 +231,7 @@ node app.js
 
 ---
 
-### ❌ Node version error
+###  Node version error
 
 ```id="arc17"
 Cannot find module 'node:buffer'
@@ -259,7 +242,7 @@ Cannot find module 'node:buffer'
 
 ---
 
-### ❌ MySQL connection issues
+###  MySQL connection issues
 
 ```id="arc18"
 EHOSTUNREACH / ECONNREFUSED
@@ -277,7 +260,7 @@ bind-address = 0.0.0.0
 
 ---
 
-### ❌ MySQL Access Denied
+###  MySQL Access Denied
 
 ```id="arc21"
 Access denied for user 'root'
@@ -293,7 +276,7 @@ FLUSH PRIVILEGES;
 
 ---
 
-### ❌ Unknown database
+###  Unknown database
 
 ```id="arc23"
 Unknown database 'userdb'
@@ -307,7 +290,7 @@ CREATE DATABASE userdb;
 
 ---
 
-### ❌ Port already in use
+###  Port already in use
 
 ```id="arc25"
 EADDRINUSE: 3000
@@ -321,7 +304,7 @@ sudo kill -9 $(sudo lsof -t -i:3000)
 
 ---
 
-### ❌ NPM permission error
+###  NPM permission error
 
 ```id="arc27"
 EACCES permission denied
@@ -335,7 +318,7 @@ sudo chown -R $USER:$USER ~/app
 
 ---
 
-### ❌ Load Balancer 502
+###  Load Balancer 502
 
 ```id="arc29"
 502 Bad Gateway
@@ -349,7 +332,7 @@ sudo chown -R $USER:$USER ~/app
 
 ---
 
-### ❌ Redis not caching
+###  Redis not caching
 
 ```id="arc30"
 keys * → empty
